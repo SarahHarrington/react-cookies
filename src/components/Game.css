@@ -1,0 +1,19 @@
+.game-container {
+  display: grid;
+  justify-content: center;
+  background-color: #233D4D;
+  height: 70vh;
+  width: 70vw;
+  border-radius: 20px;
+  border: solid 10px #203746;
+}
+
+h2 {
+  color: #FEFAE0;
+}
+
+.cookie-count {
+  width: 60px;
+  height: 60px;
+  background-color: #FCCA46;
+}
