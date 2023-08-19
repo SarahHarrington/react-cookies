@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import './Cookie.scss';
 
 export interface CookieInt {
   type: string;
@@ -6,18 +7,18 @@ export interface CookieInt {
   src: string;
 }
 
-export function Cookie({ cookie }: any) {
-  const [showCookie, setShowCookie] = useState(false);
+export default function Cookie({ cookie, id, cookieClicked, imageSize }: any) {
+  const [showCookie, setShowCookie] = useState(cookie.selected);
+  const [cardColor, setCardColor] = useState(cookie.color)
 
-  function cookieClicked(cookie: object) {
-    console.log('the cookie', cookie)
-    setShowCookie(!showCookie)
-
-  }
+  useEffect(() => {
+    setCardColor(cookie.color)
+    setShowCookie(cookie.selected)
+  }, [cookie.color, cookie.selected])
 
   return (
-    <div className='cookie-card' onClick={() => cookieClicked(cookie)}>
-      <img className={showCookie ? 'show-cookie' : 'hide-cookie'} src={cookie.src} alt={cookie.alt} />
-    </div>
+    <button disabled={cookie.selected} className={`cookie-card ${cardColor} ${imageSize}`} onClick={() => cookieClicked(cookie, id)}>
+      <img className={`${showCookie ? 'show-cookie' : 'hide-cookie'} ${imageSize}` } src={cookie.src} alt={cookie.alt} />
+    </button>
   )
 }
