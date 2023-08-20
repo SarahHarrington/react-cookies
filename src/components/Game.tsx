@@ -1,12 +1,9 @@
 import './Game.scss';
+import WinMessage from './WinMessage';
 import Cookie, { CookieInt } from './Cookie';
 import { useState, useCallback } from "react";
 import { useImmer } from 'use-immer';
 import { allCookies } from '../cookies';
-import {
-  useWindowSize,
-} from '@react-hook/window-size'
-import Confetti from 'react-confetti'
 
 export function Game() {
   const [cookies, setCookies] = useImmer<CookieInt[]>([])
@@ -17,8 +14,9 @@ export function Game() {
   const [history, setHistory] = useState<number[][]>([])
   const [jarSize, setJarSize] = useState<string>('')
   const [matchedCount, setMatchedCount] = useState<number>(0)
+  const [gameStart, setGameStart] = useState<number>()
+  const [gameLength, setGameLength] = useState<string>()
 
-  const [width, height] = useWindowSize()
   const [isFalling, setIsFalling] = useState<boolean>(false)
   
   function updateIsFalling() {
@@ -69,6 +67,7 @@ export function Game() {
   }, []);
 
   function startGame(e: any) {
+    setGameStart(Date.now())
     setCookieCount(parseInt(e.target.value))
     if(e.target.value === '10') setJarSize('small')
     if(e.target.value === '15') setJarSize('medium')
@@ -79,6 +78,21 @@ export function Game() {
     const gameCookies = shuffleCookies(shuffledCookies)
     setCookies(gameCookies)
     return
+  }
+  
+  function getGameTime() {
+    const endTime = Date.now()
+    if (gameStart) {
+      const length = (endTime - gameStart) / 1000
+      if (length > 60) {
+        const min = length / 60
+        const sec = length % 60
+        setGameLength(`That game was ${min.toFixed(0)} minutes ${sec.toFixed(0)} seconds`)
+      } else {
+        setGameLength(`That game was ${length.toFixed(0)} seconds`)
+      }
+      // setGameLength(length) 
+    }
   }
 
   async function cookieClicked(cookie: CookieInt, id: number) {
@@ -113,6 +127,7 @@ export function Game() {
         setMatchedCount(matchedCount + 1)
         if (cookieCount === matchedCount + 1) {
           updateIsFalling()
+          getGameTime()
         }
         
       } else {
@@ -143,18 +158,8 @@ export function Game() {
 
   return (
     <>
-    {isFalling &&
-        <>
-          <Confetti
-            width={width}
-            height={height}
-          />
-          <div className='win-message'>
-            <h1>You won!</h1>
-            <p>Attempts: {attempts}</p>
-            <button onClick={resetGame}>play again?</button>
-          </div>
-        </>        
+      {isFalling &&
+        <WinMessage attempts={attempts} resetGame={resetGame} gameLength={gameLength}/>
       }
       <div className='game-container'>
         <div className='game-header'>
@@ -162,20 +167,20 @@ export function Game() {
           <h1>Cookie Confusion</h1>
         </div>
         {cookieCount !== 0 &&
-        <div className={`cookie-jar ${jarSize}`}>
-          {
-            cookies.map((cookie: CookieInt, index) => (
-              <Cookie 
-                key={index} 
-                id={index} 
-                cookie={cookie} 
-                cookieClicked={cookieClicked} 
-                imageSize={jarSize}
-                clearCookie={clearCookie}
-              />
-            ))
-          }
-        </div>
+          <div className={`cookie-jar ${jarSize}`}>
+            {
+              cookies.map((cookie: CookieInt, index) => (
+                <Cookie 
+                  key={index} 
+                  id={index} 
+                  cookie={cookie} 
+                  cookieClicked={cookieClicked} 
+                  imageSize={jarSize}
+                  clearCookie={clearCookie}
+                />
+              ))
+            }
+          </div>
         }
           {cookieCount === 0 && 
             <>
