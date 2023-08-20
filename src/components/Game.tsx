@@ -1,18 +1,17 @@
 import './Game.scss';
 import Cookie, { CookieInt } from './Cookie';
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import { useImmer } from 'use-immer';
 import { allCookies } from '../cookies';
 
 export function Game() {
-  const [cookies, setCookies] = useState<CookieInt[]>([])
+  const [cookies, setCookies] = useImmer<CookieInt[]>([])
   const [cookieCount, setCookieCount] = useState(0)
   const [firstCookie, setFirstCookie] = useState<number | null>(null)
-  const [secondCookie, setSecondCookie] = useState<number | null>(null)
   const [checkingMatch, setCheckingMatch] = useState<boolean>(false)
   const [attempts, setAttempts] = useState<number>(0)
   const [history, setHistory] = useState<number[][]>([])
   const [jarSize, setJarSize] = useState<string>('')
-  const [timeoutId, setTimeoutId] = useState<any>(null)
 
   function shuffleCookies(cookiesToShuffle: any) {
     let currentIndex = cookiesToShuffle.length, temporaryValue, randomIndex;
@@ -26,6 +25,36 @@ export function Game() {
     }
     return cookiesToShuffle;
   }
+
+  const clearCookie = useCallback((id: number) => {
+    setCookies((draft) => {
+      const c = draft.find((cookie, index) => index === id);
+      if (c) {
+        c.color = ''
+        c.selected = false
+      }
+    });
+  }, []);
+
+  const greenCookie = useCallback((id: number) => {
+    setCookies((draft) => {
+      const c = draft.find((cookie, index) => index === id);
+      if (c) {
+        c.color = 'green'
+        c.selected = true
+      }
+    });
+  }, []);
+
+  const orangeCookie = useCallback((id: number) => {
+    setCookies((draft) => {
+      const c = draft.find((cookie, index) => index === id);
+      if (c) {
+        c.color = 'orange'
+        c.selected = true
+      }
+    });
+  }, []);
 
   function startGame(e: any) {
     setCookieCount(e.target.value)
@@ -41,92 +70,46 @@ export function Game() {
   }
 
   async function cookieClicked(cookie: CookieInt, id: number) {
+    cookies.map((cookie, index) => {
+      if (cookie.color === 'orange') clearCookie(index)
+    })
+    if (checkingMatch) return
     console.log('cookie clicked', cookie)
-    if (checkingMatch) {
-      return
-    }  else {
-      console.log('in cookie clicked else: timeoutId', timeoutId)
-      if (timeoutId !== null) {
-        clearTimeout(timeoutId)
-        setTimeoutId(null)
-        clearUnmatchedCookies(id);
-      } else {
-        setCheckingMatch(true)
-        await checkForMatch(cookie, id)
-      }
-    }
+    checkForMatch(cookie, id)
   }
 
-  function clearUnmatchedCookies(id: number | null = null) {
-    const clearedTempCookies = cookies.map((cookie: CookieInt, index) => {
-      if (index === firstCookie || index === secondCookie) {
-        return {... cookie, color: '', selected: false}
-      } else if (id) {
-        if (id === index) {
-          setFirstCookie(id)
-          return {...cookie, color: 'green', selected: true}
-        } else {
-          return cookie
-        }
-      } else {
-        return cookie
-      }
-    })
-    setCookies(clearedTempCookies)
-    if (id === null) setFirstCookie(null)
-    setSecondCookie(null)
-    return;
+  function finishRound(firstCookie: number, id: number) {
+    setAttempts(attempts + 1)
+    setCheckingMatch(false)
+    setHistory([...history, [firstCookie, id]])
+    setFirstCookie(null)
   }
 
   async function checkForMatch(cookie: any, id: number) {
     if (firstCookie === null) {
-      console.log('first cookie if')
-      const tempCookies = cookies.map((cookie: CookieInt, index) => {
-        if (index === id)  return {...cookie, color: 'green', selected: true}
-        return cookie;
-      })
-      setCookies(tempCookies)
+      greenCookie(id)
       setFirstCookie(id)
       setCheckingMatch(false)
       return
     } else {
-      console.log('second cookie if')
-      setSecondCookie(id)
       if (cookies[firstCookie].type === cookies[id].type) {
-        console.log('yay match!')
-        const tempCookies = cookies.map((cookie: CookieInt, index) => {
+        cookies.map((cookie: CookieInt, index) => {
           if (index === firstCookie || index === id) {
-            return {... cookie, color: 'green', selected: true}
-          } else {
-            return cookie
+            greenCookie(id)
           }
         })
-        setAttempts(attempts + 1)
-        setCheckingMatch(false)
-        setCookies(tempCookies)
-        setHistory([...history, [firstCookie, id]])
-        setFirstCookie(null)
-        setSecondCookie(null)
       } else {
-        console.log('no match')
-        const tempCookies = cookies.map((cookie: CookieInt, index) => {
+        cookies.map((cookie: CookieInt, index) => {
           if (index === firstCookie || index === id) {
-            return {... cookie, color: 'orange', selected: true}
+            orangeCookie(id)
+            orangeCookie(firstCookie)
           } else {
-            return {...cookie, disabled: true}
+            return cookie;
           }
         })
-        setCookies(tempCookies)
-        setCheckingMatch(false)
-        setAttempts(attempts + 1)
-        
-        const timeoutId = setTimeout(() => {
-          clearUnmatchedCookies();
-          setTimeoutId(null)
-        }, 2500)
-        setTimeoutId(timeoutId)
       }
     }
+    finishRound(firstCookie, id)
   }
 
   return (
@@ -141,7 +124,14 @@ export function Game() {
         <div className={`cookie-jar ${jarSize}`}>
           {
             cookies.map((cookie: CookieInt, index) => (
-              <Cookie key={index} id={index} cookie={cookie} cookieClicked={cookieClicked} imageSize={jarSize}/>
+              <Cookie 
+                key={index} 
+                id={index} 
+                cookie={cookie} 
+                cookieClicked={cookieClicked} 
+                imageSize={jarSize}
+                clearCookie={clearCookie}
+              />
             ))
           }
         </div>

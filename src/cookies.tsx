@@ -2,7 +2,7 @@ export const allCookies = [
   {
     type: 'butter',
     alt: 'Butter Cookie',
-    src: 'cookies/butter.png'
+    src: 'cookies/butter.png',
   },
   {
     type: 'carmeldelite',
