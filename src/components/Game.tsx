@@ -3,8 +3,12 @@ import Cookie, { CookieInt } from './Cookie';
 import { useState, useCallback } from "react";
 import { useImmer } from 'use-immer';
 import { allCookies } from '../cookies';
+import {
+  useWindowSize,
+} from '@react-hook/window-size'
+import Confetti from 'react-confetti'
 
-export function Game({updateIsFalling}: any) {
+export function Game() {
   const [cookies, setCookies] = useImmer<CookieInt[]>([])
   const [cookieCount, setCookieCount] = useState<number>(0)
   const [firstCookie, setFirstCookie] = useState<number | null>(null)
@@ -12,7 +16,14 @@ export function Game({updateIsFalling}: any) {
   const [attempts, setAttempts] = useState<number>(0)
   const [history, setHistory] = useState<number[][]>([])
   const [jarSize, setJarSize] = useState<string>('')
-  const [matchedCount, setMatchedCount] = useState<number>(0) 
+  const [matchedCount, setMatchedCount] = useState<number>(0)
+
+  const [width, height] = useWindowSize()
+  const [isFalling, setIsFalling] = useState<boolean>(false)
+  
+  function updateIsFalling() {
+    setIsFalling(true)
+  }
   
   function shuffleCookies(cookiesToShuffle: any) {
     let currentIndex = cookiesToShuffle.length, temporaryValue, randomIndex;
@@ -118,13 +129,37 @@ export function Game({updateIsFalling}: any) {
     finishRound(firstCookie, id)
   }
 
+  function resetGame() {
+    setAttempts(0)
+    setIsFalling(false)
+    setFirstCookie(null)
+    setCookieCount(0)
+    setJarSize('')
+    setMatchedCount(0)
+    setCheckingMatch(false)
+    setHistory([])
+    setCookies([])
+  }
+
   return (
     <>
+    {isFalling &&
+        <>
+          <Confetti
+            width={width}
+            height={height}
+          />
+          <div className='win-message'>
+            <h1>You won!</h1>
+            <p>Attempts: {attempts}</p>
+            <button onClick={resetGame}>play again?</button>
+          </div>
+        </>        
+      }
       <div className='game-container'>
         <div className='game-header'>
           <div></div>
           <h1>Cookie Confusion</h1>
-          <div>attempts: {attempts}</div>
         </div>
         {cookieCount !== 0 &&
         <div className={`cookie-jar ${jarSize}`}>
