@@ -4,15 +4,16 @@ import { useState, useCallback } from "react";
 import { useImmer } from 'use-immer';
 import { allCookies } from '../cookies';
 
-export function Game() {
+export function Game({updateIsFalling}: any) {
   const [cookies, setCookies] = useImmer<CookieInt[]>([])
-  const [cookieCount, setCookieCount] = useState(0)
+  const [cookieCount, setCookieCount] = useState<number>(0)
   const [firstCookie, setFirstCookie] = useState<number | null>(null)
   const [checkingMatch, setCheckingMatch] = useState<boolean>(false)
   const [attempts, setAttempts] = useState<number>(0)
   const [history, setHistory] = useState<number[][]>([])
   const [jarSize, setJarSize] = useState<string>('')
-
+  const [matchedCount, setMatchedCount] = useState<number>(0) 
+  
   function shuffleCookies(cookiesToShuffle: any) {
     let currentIndex = cookiesToShuffle.length, temporaryValue, randomIndex;
 
@@ -57,7 +58,7 @@ export function Game() {
   }, []);
 
   function startGame(e: any) {
-    setCookieCount(e.target.value)
+    setCookieCount(parseInt(e.target.value))
     if(e.target.value === '10') setJarSize('small')
     if(e.target.value === '15') setJarSize('medium')
     if(e.target.value === '20') setJarSize('large')
@@ -98,6 +99,11 @@ export function Game() {
             greenCookie(id)
           }
         })
+        setMatchedCount(matchedCount + 1)
+        if (cookieCount === matchedCount + 1) {
+          updateIsFalling()
+        }
+        
       } else {
         cookies.map((cookie: CookieInt, index) => {
           if (index === firstCookie || index === id) {

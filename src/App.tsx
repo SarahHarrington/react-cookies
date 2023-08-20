@@ -9,18 +9,28 @@ import Confetti from 'react-confetti'
 
 function App() {
   const [width, height] = useWindowSize()
-  const [isFalling, setIsFalling] = useState(true)
-    return (
-      <div className="App">
-        {isFalling &&         
+  const [isFalling, setIsFalling] = useState<boolean>(true)
+  
+  function updateIsFalling() {
+    setIsFalling(true)
+  }
+  
+  return (
+    <div className="App">
+      {isFalling &&
+        <>
           <Confetti
             width={width}
             height={height}
           />
-        }
-
-        <Game />
-      </div>
+          <div className='win-message'>
+            <h1>You won!</h1>
+            <button >play again?</button>
+          </div>
+        </>        
+      }
+      <Game updateIsFalling={updateIsFalling}/>
+    </div>
   );
 }
 

@@ -3,8 +3,42 @@ body {
 }
 
 .App {
+  display: grid;
+  grid-template-columns: 1fr;
   justify-items: center;
   background-color: #619B8A;
+}
+
+.win-message {
+  border-radius: 20px;
+  position: absolute;
+  align-self: center;
+  width: 50%;
+  height: 50vh;
+  background-color: #FCCA46;
+  z-index: 1;
+  text-align: center;
+  border: solid 5px #FE7F2D;
+}
+
+.win-message button {
+  border: none;
+  width: 10vw;
+  background-color: #203746;
+  color: #FEFAE0;
+  height: 10vh;
+  border-radius: 20px;
+  box-shadow: 5px 5px 5px 0px rgba(19, 33, 42, 0.5);
+}
+
+.win-message button:hover {
+  background-color: #2D4D62;
+  box-shadow: 5px 5px 5px 0px rgba(19, 33, 42, 0.5);
+}
+
+.win-message button:active {
+  background-color: #2D4D62;
+  box-shadow: 2.5px 2.5px 2.5px 0px rgba(19, 33, 42, 0.5);
 }
 
 h1 {
