@@ -91,7 +91,6 @@ export function Game() {
       } else {
         setGameLength(`That game was ${length.toFixed(0)} seconds`)
       }
-      // setGameLength(length) 
     }
   }
 

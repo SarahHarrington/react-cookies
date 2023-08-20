@@ -5,8 +5,8 @@ import Confetti from 'react-confetti'
 
 interface WinMessageProps {
   attempts: number;
-  resetGame: Function;
   gameLength: string;
+  resetGame: () => void;
 }
 
 export default function WinMessage({attempts, resetGame, gameLength}: WinMessageProps) {
@@ -24,7 +24,7 @@ export default function WinMessage({attempts, resetGame, gameLength}: WinMessage
       <h1>You won!</h1>
       <p>Attempts: {attempts}</p>
       <p>{gameLength}</p>
-      <button onClick={() => resetGame}>play again?</button>
+      <button onClick={resetGame}>play again?</button>
     </div>
   </>
   )
