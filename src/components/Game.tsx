@@ -14,8 +14,8 @@ export function Game() {
   const [history, setHistory] = useState<number[][]>([])
   const [jarSize, setJarSize] = useState<string>('')
   const [matchedCount, setMatchedCount] = useState<number>(0)
-  const [gameStart, setGameStart] = useState<number>()
-  const [gameLength, setGameLength] = useState<string>()
+  const [gameStart, setGameStart] = useState<number>(0)
+  const [gameLength, setGameLength] = useState<string>('')
 
   const [isFalling, setIsFalling] = useState<boolean>(false)
   
@@ -100,7 +100,6 @@ export function Game() {
       if (cookie.color === 'orange') clearCookie(index)
     })
     if (checkingMatch) return
-    console.log('cookie clicked', cookie)
     checkForMatch(cookie, id)
   }
 
@@ -123,6 +122,7 @@ export function Game() {
           if (index === firstCookie || index === id) {
             greenCookie(id)
           }
+          return
         })
         setMatchedCount(matchedCount + 1)
         if (cookieCount === matchedCount + 1) {

@@ -3,7 +3,13 @@ import {
 } from '@react-hook/window-size'
 import Confetti from 'react-confetti'
 
-export default function WinMessage({attempts, resetGame, gameLength}: any) {
+interface WinMessageProps {
+  attempts: number;
+  resetGame: Function;
+  gameLength: string;
+}
+
+export default function WinMessage({attempts, resetGame, gameLength}: WinMessageProps) {
   const [width, height] = useWindowSize()
 
   return (
@@ -18,7 +24,7 @@ export default function WinMessage({attempts, resetGame, gameLength}: any) {
       <h1>You won!</h1>
       <p>Attempts: {attempts}</p>
       <p>{gameLength}</p>
-      <button onClick={resetGame}>play again?</button>
+      <button onClick={() => resetGame}>play again?</button>
     </div>
   </>
   )

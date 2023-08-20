@@ -9,7 +9,15 @@ export interface CookieInt {
   selected: boolean;
 }
 
-export default function Cookie({ cookie, id, cookieClicked, imageSize, clearCookie }: any) {
+interface CookieProps {
+  cookie: CookieInt;
+  id: number;
+  cookieClicked: Function;
+  imageSize: string;
+  clearCookie: Function;
+}
+
+export default function Cookie({ cookie, id, cookieClicked, imageSize, clearCookie }: CookieProps) {
   const [showCookie, setShowCookie] = useState(cookie.selected);
   const [cardColor, setCardColor] = useState(cookie.color)
   const [disabled, setDisabled] = useState(false)
