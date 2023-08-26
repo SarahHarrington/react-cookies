@@ -2,6 +2,8 @@
 
 This is a matching game with cookies. 
 
+![Cookie Confusion](https://user-images.githubusercontent.com/23586622/263498044-ba7236d7-cc83-4fb3-aa71-28422055a864.gif)
+
 [Match some cookies!](https://cookieconfusionreact.sarahdoes.tech/)
 
 This project uses:
